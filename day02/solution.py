@@ -13,7 +13,6 @@ def monotonically_decreasing(l):
 
 
 def problem1(data):
-
     print(
         "problem 1: ",
         sum(
