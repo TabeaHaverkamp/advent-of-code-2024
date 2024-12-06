@@ -96,5 +96,5 @@ print("solution 1: ", solution1(copy.deepcopy(data), idx, direction)[1])
 
 start_time = time.time()
 
-print("solution 2: ", solution2(copy.deepcopy(data), idx, direction))
+print("solution 2: ", solution2(data, idx, direction))
 print("--- %s seconds ---" % (time.time() - start_time))
