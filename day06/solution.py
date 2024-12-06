@@ -51,7 +51,7 @@ def solution1(data, index, direction):
 
 
 def solution2(data, index, direction):
-    def check_loop(data, index, direction):
+    def check_loop(data, index, direction, made_obstacle):
 
         visited = set()
         while True:
@@ -69,22 +69,20 @@ def solution2(data, index, direction):
 
             if (index, direction) in visited:
                 return 1
+            elif s == "#" or new_index == made_obstacle:
+                direction = turns[direction]
             elif s == "." or any(
                 [(new_index, d) in visited for d in directions.keys()]
             ):
                 visited.add((index, direction))
                 index = new_index
-            elif s == "#" or s == "O":
-                direction = turns[direction]
 
     walked, _ = solution1(copy.deepcopy(data), index, direction)
     loop_counter = 0
     for i, row in enumerate(walked):
         for j, elem in enumerate(row):
             if (i, j) != index and elem == "X":
-                dat = copy.deepcopy(data)
-                dat[i][j] = "O"
-                cl = check_loop(dat, index, direction)
+                cl = check_loop(data, index, direction, (i, j))
                 loop_counter += cl
     return loop_counter
 
