@@ -1,4 +1,5 @@
 import copy
+import time
 
 
 def parse_input(file_path):
@@ -22,9 +23,6 @@ def parse_input(file_path):
 
 
 def solution1(data, index, direction):
-
-    directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
-    turns = {"U": "R", "R": "D", "D": "L", "L": "U"}
     counter = 0
     out = False
     while not out:
@@ -54,8 +52,7 @@ def solution1(data, index, direction):
 
 def solution2(data, index, direction):
     def check_loop(data, index, direction):
-        directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
-        turns = {"U": "R", "R": "D", "D": "L", "L": "U"}
+
         visited = set()
         while True:
             add = directions[direction]
@@ -70,16 +67,14 @@ def solution2(data, index, direction):
             else:
                 s = data[new_index[0]][new_index[1]]
 
-            if (new_index, direction) in visited:
+            if (index, direction) in visited:
                 return 1
             elif s == "." or s in directions.keys():
                 if data[index[0]][index[1]] not in directions.keys():
                     data[index[0]][index[1]] = direction
-                index = new_index
                 visited.add((index, direction))
-
-            elif s == "#" or s == "O" or s in directions.keys():
-                data[index[0]][index[1]] = direction
+                index = new_index
+            elif s == "#" or s == "O":
                 direction = turns[direction]
 
     walked, _ = solution1(copy.deepcopy(data), index, direction)
@@ -94,6 +89,14 @@ def solution2(data, index, direction):
     return loop_counter
 
 
+directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
+turns = {"U": "R", "R": "D", "D": "L", "L": "U"}
+
+
 data, idx, direction = parse_input("input.txt")
 print("solution 1: ", solution1(copy.deepcopy(data), idx, direction)[1])
+
+start_time = time.time()
+
 print("solution 2: ", solution2(copy.deepcopy(data), idx, direction))
+print("--- %s seconds ---" % (time.time() - start_time))
