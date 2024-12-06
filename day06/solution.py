@@ -18,14 +18,15 @@ def parse_input(file_path):
             ),
             None,
         )
+        direction = symbols[data[index[0]][index[1]]]
+        data[index[0]][index[1]] = "."
 
-    return (data, index, symbols[data[index[0]][index[1]]])
+    return (data, index, direction)
 
 
 def solution1(data, index, direction):
-    counter = 0
-    out = False
-    while not out:
+    visited = set()
+    while True:
         add = directions[direction]
         new_index = (index[0] + add[0], index[1] + add[1])
 
@@ -35,19 +36,15 @@ def solution1(data, index, direction):
             or new_index[0] < 0
             or new_index[1] < 0
         ):
-            out = True
-            s = data[index[0]][index[1]]
+            visited.add(index)
+            return visited
         else:
             s = data[new_index[0]][new_index[1]]
-
-        if s == "." or s == "X":
-            data[index[0]][index[1]] = "X"
-            index = new_index
             if s == ".":
-                counter += 1
-        elif s == "#":
-            direction = turns[direction]
-    return data, counter
+                visited.add(index)
+                index = new_index
+            elif s == "#":
+                direction = turns[direction]
 
 
 def solution2(data, index, direction):
@@ -71,30 +68,25 @@ def solution2(data, index, direction):
                 return 1
             elif s == "#" or new_index == made_obstacle:
                 direction = turns[direction]
-            elif s == "." or any(
-                [(new_index, d) in visited for d in directions.keys()]
-            ):
+            elif s == ".":
                 visited.add((index, direction))
                 index = new_index
 
-    walked, _ = solution1(copy.deepcopy(data), index, direction)
+    walked = solution1(data, index, direction)
     loop_counter = 0
-    for i, row in enumerate(walked):
-        for j, elem in enumerate(row):
-            if (i, j) != index and elem == "X":
-                cl = check_loop(data, index, direction, (i, j))
-                loop_counter += cl
+    for i, row in enumerate(data):
+        for j, _ in enumerate(row):
+            if (i, j) != index and (i, j) in walked:
+                loop_counter += check_loop(data, index, direction, (i, j))
     return loop_counter
 
 
 directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
 turns = {"U": "R", "R": "D", "D": "L", "L": "U"}
 
-
-data, idx, direction = parse_input("input.txt")
-print("solution 1: ", solution1(copy.deepcopy(data), idx, direction)[1])
-
 start_time = time.time()
 
+data, idx, direction = parse_input("input.txt")
+print("solution 1: ", len(solution1(data, idx, direction)))
 print("solution 2: ", solution2(data, idx, direction))
 print("--- %s seconds ---" % (time.time() - start_time))
