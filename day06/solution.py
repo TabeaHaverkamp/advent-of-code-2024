@@ -69,9 +69,9 @@ def solution2(data, index, direction):
 
             if (index, direction) in visited:
                 return 1
-            elif s == "." or s in directions.keys():
-                if data[index[0]][index[1]] not in directions.keys():
-                    data[index[0]][index[1]] = direction
+            elif s == "." or any(
+                [(new_index, d) in visited for d in directions.keys()]
+            ):
                 visited.add((index, direction))
                 index = new_index
             elif s == "#" or s == "O":
