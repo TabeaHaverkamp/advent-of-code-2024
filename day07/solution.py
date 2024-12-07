@@ -15,21 +15,24 @@ def math(result, subtotal, input, solution_part):
         return subtotal == result
     elif subtotal > result:
         return False
-    else:
-        i = input[0]
-        plus = math(result, subtotal + i, input[1:], solution_part)
-        if plus:
+
+    i = input[0]
+    if subtotal == 0:
+        return math(result, i, input[1:], solution_part)
+
+    plus = math(result, subtotal + i, input[1:], solution_part)
+    if plus:
+        return True
+    mul = math(result, subtotal * i, input[1:], solution_part)
+    if mul:
+        return True
+
+    if solution_part == 2:
+        app = math(result, int(str(subtotal) + str(i)), input[1:], solution_part)
+        if app:
             return True
 
-        mul = math(result, subtotal * i, input[1:], solution_part)
-        if mul:
-            return True
-        if solution_part == 2:
-            app = math(result, int(str(subtotal) + str(i)), input[1:], solution_part)
-            if app:
-                return True
-
-        return False
+    return False
 
 
 def solution1(data):
@@ -51,4 +54,4 @@ print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 
 start_time = time.time()
 sol2 = solution2(data)
-print(f"solution 1: {sol2} (runtime: {(time.time() - start_time)} seconds)")
+print(f"solution 2: {sol2} (runtime: {(time.time() - start_time)} seconds)")
