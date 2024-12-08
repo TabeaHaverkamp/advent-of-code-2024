@@ -17,22 +17,21 @@ def solution(data, solution_part=1):
 
     antinodes = set()
     for _, occ in antennaes.items():
-        combinations = list(itertools.combinations(occ, 2))
+        combinations = list(itertools.product(occ, occ))
         for c1, c2 in combinations:
+            if c1 == c2:
+                continue
             dist_x = c1[0] - c2[0]
             dist_y = c1[1] - c2[1]
 
             if solution_part == 1:
                 antinodes.add((c1[0] + dist_x, c1[1] + dist_y))
-                antinodes.add((c2[0] - dist_x, c2[1] - dist_y))
             elif solution_part == 2:
                 i = 0
-                while c1[0] + i * dist_x >= 0 and c1[1] + i * dist_y >= 0:
+                while 0 <= c1[0] + i * dist_x < len(data) and 0 <= c1[
+                    1
+                ] + i * dist_y < len(data):
                     antinodes.add((c1[0] + i * dist_x, c1[1] + i * dist_y))
-                    i += 1
-                i = 0
-                while c2[0] - i * dist_x < len(data) and c2[1] - i * dist_y < len(data):
-                    antinodes.add((c2[0] - i * dist_x, c2[1] - i * dist_y))
                     i += 1
 
     # remove antinodes outside of grid
