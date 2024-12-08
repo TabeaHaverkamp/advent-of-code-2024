@@ -1,5 +1,3 @@
-import functools
-import operator
 import itertools
 import time
 
@@ -11,16 +9,14 @@ def parse_input(file_path):
 
 
 def solution(data, solution_part=1):
-    elems = set(functools.reduce(operator.iconcat, data, []))
-    elems.remove(".")
+    antennaes = {}
+    for ridx, row in enumerate(data):
+        for cidx, val in enumerate(row):
+            if val != ".":
+                antennaes.setdefault(val, []).append((ridx, cidx))
+
     antinodes = set()
-    for elem in elems:
-        occ = [
-            (ridx, cidx)
-            for ridx, row in enumerate(data)
-            for cidx, val in enumerate(row)
-            if val == elem
-        ]
+    for _, occ in antennaes.items():
         combinations = list(itertools.combinations(occ, 2))
         for c1, c2 in combinations:
             dist_x = c1[0] - c2[0]
