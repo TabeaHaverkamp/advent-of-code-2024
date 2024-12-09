@@ -12,29 +12,27 @@ def parse_input(file_path):
 
 def solution1(data):
     def build_array(data):
-        for line in data:
-            block = ""
-            f = []
-            for idx, elem in enumerate(line):
-                if idx % 2 == 0:
-                    block += "a" * int(elem)
-                    f.append([int(idx / 2)] * int(elem))
-                else:
-                    block += "." * int(elem)
-            f = [item for sublist in f for item in sublist]
+        data = data[0]
+        block = ""
+        f = []
+        for idx, elem in enumerate(data):
+            if idx % 2 == 0:
+                block += "a" * int(elem)
+                f.append([int(idx / 2)] * int(elem))
+            else:
+                block += "." * int(elem)
+        f = [item for sublist in f for item in sublist]
         return block, f
 
     blocks, b = build_array(data)
     free_space = blocks.count(".")
     used_space = len(blocks) - free_space
-    print(free_space, used_space)
     for idx, elem in enumerate(blocks):
         if idx > used_space:
             break
         if elem == ".":
             b.insert(idx, b[-1])
             b = b[:-1]
-    print(b)
     res = sum([idx * int(elem) for idx, elem in enumerate(b)])
 
     return res
@@ -42,23 +40,21 @@ def solution1(data):
 
 def solution2(data):
     def build_array(data):
-        for line in data:
-            if len(line) % 2 != 0:
-                print("added last free block")
-                line += "0"
-            free = []
-            used = []
-            for idx, elem in enumerate(line):
-                if idx % 2 == 0:
-                    used.append([int(idx / 2)] * int(elem))
-                else:
-                    free.append(int(elem))
+        data = data[0]
+        if len(data) % 2 != 0:
+            data += "0"
+        free = []
+        used = []
+        for idx, elem in enumerate(data):
+            if idx % 2 == 0:
+                used.append([int(idx / 2)] * int(elem))
+            else:
+                free.append(int(elem))
         return free, used
 
     free, used = build_array(data)
     b = [(a, ["."] * b, 0) for a, b in zip(used, free)]
     for ridx, elem in enumerate(list(reversed(used))):
-        # print(f"looking at elem {elem} at reveresed index {ridx}")
         replaced = False
         free_idx = 0
         while (not replaced) and free_idx < len(free):
@@ -95,6 +91,3 @@ print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 start_time = time.time()
 sol1 = solution2(data)
 print(f"solution 2: {sol1} (runtime: {(time.time() - start_time)} seconds)")
-
-
-# 7086027925013 too high
