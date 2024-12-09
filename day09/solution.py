@@ -1,5 +1,8 @@
 import time
 
+import functools
+import operator
+
 
 def parse_input(file_path):
     with open(file_path, "r") as file:
@@ -7,24 +10,21 @@ def parse_input(file_path):
     return data
 
 
-def build_array(data):
-    for line in data:
-        block = ""
-        f = []
-        for idx, elem in enumerate(line):
-            if idx % 2 == 0:
-                block += "a" * int(elem)
-                f.append([int(idx / 2)] * int(elem))
-            else:
-                block += "." * int(elem)
-        f = [item for sublist in f for item in sublist]
-    return block, f
-
-
 def solution1(data):
+    def build_array(data):
+        for line in data:
+            block = ""
+            f = []
+            for idx, elem in enumerate(line):
+                if idx % 2 == 0:
+                    block += "a" * int(elem)
+                    f.append([int(idx / 2)] * int(elem))
+                else:
+                    block += "." * int(elem)
+            f = [item for sublist in f for item in sublist]
+        return block, f
+
     blocks, b = build_array(data)
-    # print('blocks', blocks)
-    # print('b', b)
     free_space = blocks.count(".")
     used_space = len(blocks) - free_space
     print(free_space, used_space)
@@ -32,12 +32,57 @@ def solution1(data):
         if idx > used_space:
             break
         if elem == ".":
-            # print(b[:idx], b[-1], b[idx:])
             b.insert(idx, b[-1])
             b = b[:-1]
-            # print(b[:idx])
-
+    print(b)
     res = sum([idx * int(elem) for idx, elem in enumerate(b)])
+
+    return res
+
+
+def solution2(data):
+    def build_array(data):
+        for line in data:
+            if len(line) % 2 != 0:
+                print("added last free block")
+                line += "0"
+            free = []
+            used = []
+            for idx, elem in enumerate(line):
+                if idx % 2 == 0:
+                    used.append([int(idx / 2)] * int(elem))
+                else:
+                    free.append(int(elem))
+        return free, used
+
+    free, used = build_array(data)
+    b = [(a, ["."] * b, 0) for a, b in zip(used, free)]
+    for ridx, elem in enumerate(list(reversed(used))):
+        # print(f"looking at elem {elem} at reveresed index {ridx}")
+        replaced = False
+        free_idx = 0
+        while (not replaced) and free_idx < len(free):
+            j = len(used) - 1 - ridx  # to be removed, proper index of used
+            if free_idx >= j or len(elem) == 0:
+                replaced = True
+
+            elif len(elem) <= b[free_idx][1].count("."):
+                # insert into free spots at idx i
+                u = b[free_idx][1]
+                moved = b[free_idx][2]
+                b[free_idx] = (
+                    b[free_idx][0],
+                    u[:moved] + elem + u[(len(elem) + moved) :],
+                    moved + len(elem),
+                )
+                # remove from spot j
+                b[j] = ([], ["."] * len(elem) + b[j][1], b[j][2])
+                replaced = True
+
+            free_idx += 1
+
+    a = [item for sublist in [x + y for (x, y, _) in b] for item in sublist]
+    res = sum([idx * elem for idx, elem in enumerate(a) if isinstance(elem, int)])
 
     return res
 
@@ -47,6 +92,9 @@ start_time = time.time()
 sol1 = solution1(data)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 
-# start_time = time.time()
-# sol1 = solution1(data)
-# print(f"solution 2: {sol1} (runtime: {(time.time() - start_time)} seconds)")
+start_time = time.time()
+sol1 = solution2(data)
+print(f"solution 2: {sol1} (runtime: {(time.time() - start_time)} seconds)")
+
+
+# 7086027925013 too high
