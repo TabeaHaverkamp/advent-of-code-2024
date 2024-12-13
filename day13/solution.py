@@ -27,14 +27,14 @@ def solution(data, solution_part=1):
     button_costs = 0
     for _, prob in enumerate(data):
         a, b = symbols("a,b ")
-        button_a = prob["Button B"]
-        button_b = prob["Button A"]
+        button_a = prob["Button A"]
+        button_b = prob["Button B"]
         prize = prob["Prize"]
         if solution_part == 2:
             prize = [i + 10000000000000 for i in prize]
         # defining equations
-        eq1 = Eq((button_a[0] * b + button_b[0] * a), prize[0])
-        eq2 = Eq((button_a[1] * b + button_b[1] * a), prize[1])
+        eq1 = Eq((button_a[0] * a + button_b[0] * b), prize[0])
+        eq2 = Eq((button_a[1] * a + button_b[1] * b), prize[1])
 
         # solving the equation
         solutions = solve((eq1, eq2), (a, b))
