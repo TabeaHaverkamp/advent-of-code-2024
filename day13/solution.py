@@ -1,5 +1,6 @@
 from sympy import symbols, Eq, solve
 import time
+import re
 
 
 def parse_input(file_path):
@@ -8,18 +9,8 @@ def parse_input(file_path):
         result = []
 
         for batch in input.strip().split("\n\n"):
-            lines = batch.splitlines()  # Split batch into individual lines
-            batch_dict = {}
-            for line in lines:
-                key, value = line.split(":", 1)  # Split at the first colon
-                if "=" in value:
-                    split_char = "="
-                else:
-                    split_char = "+"
-                value = [int(x.split(split_char)[1]) for x in value.strip().split(",")]
-
-                batch_dict[key.strip()] = value
-            result.append(batch_dict)
+            ax, ay, bx, by, x, y = map(int, re.findall("(\d+)", batch))
+            result.append([ax, ay, bx, by, x, y])
     return result
 
 
@@ -27,14 +18,13 @@ def solution(data, solution_part=1):
     button_costs = 0
     for _, prob in enumerate(data):
         a, b = symbols("a,b ")
-        button_a = prob["Button A"]
-        button_b = prob["Button B"]
-        prize = prob["Prize"]
+        ax, ay, bx, by, x, y = prob
         if solution_part == 2:
-            prize = [i + 10000000000000 for i in prize]
+            x += 10000000000000
+            y += 10000000000000
         # defining equations
-        eq1 = Eq((button_a[0] * a + button_b[0] * b), prize[0])
-        eq2 = Eq((button_a[1] * a + button_b[1] * b), prize[1])
+        eq1 = Eq((ax * a + bx * b), x)
+        eq2 = Eq((ay * a + by * b), y)
 
         # solving the equation
         solutions = solve((eq1, eq2), (a, b))
