@@ -20,17 +20,18 @@ def parse_input(file_path):
 
                 batch_dict[key.strip()] = value
             result.append(batch_dict)
-
     return result
 
 
-def solution1(data):
+def solution(data, solution_part=1):
     button_costs = 0
-    for prob in data:
+    for _, prob in enumerate(data):
         a, b = symbols("a,b ")
         button_a = prob["Button B"]
         button_b = prob["Button A"]
         prize = prob["Prize"]
+        if solution_part == 2:
+            prize = [i + 10000000000000 for i in prize]
         # defining equations
         eq1 = Eq((button_a[0] * b + button_b[0] * a), prize[0])
         eq2 = Eq((button_a[1] * b + button_b[1] * a), prize[1])
@@ -40,7 +41,6 @@ def solution1(data):
 
         if solutions[a].is_integer and solutions[b].is_integer:
             button_cost = 3 * solutions[a] + solutions[b]
-            print(button_cost, prob)
             button_costs += button_cost
     return button_costs
 
@@ -48,5 +48,9 @@ def solution1(data):
 data = parse_input("input.txt")
 
 start_time = time.time()
-sol1 = solution1(data)
+sol1 = solution(data, solution_part=1)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
+
+start_time = time.time()
+sol2 = solution(data, solution_part=2)
+print(f"solution 2: {sol2} (runtime: {(time.time() - start_time)} seconds)")
