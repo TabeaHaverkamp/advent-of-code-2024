@@ -26,9 +26,6 @@ def solution1(data):
             pos_y = (pos_y + vel_y) % size[1]
 
         result[(pos_x, pos_y)] = result.get((pos_x, pos_y), 0) + 1
-        res = [["." for _ in range(size[1])] for _ in range(size[0])]
-        for k, v in result.items():
-            res[k[0]][k[1]] = str(v)
 
     res = [[0 for _ in range(size[1])] for _ in range(size[0])]
     for k, v in result.items():
@@ -51,9 +48,10 @@ def solution1(data):
 def solution2(data, print_tree=False):
 
     found_christmas_tree = False
-    i = 1
-    while not found_christmas_tree:
+    i = 0
+    while not found_christmas_tree or i >= 10000:
         result = {}
+        i += 1
 
         res = [["." for _ in range(size[1])] for _ in range(size[0])]
         for idx, robot in enumerate(data):
@@ -79,12 +77,8 @@ def solution2(data, print_tree=False):
                 for l in res:
                     print("".join(l), pattern in "".join(l))
             found_christmas_tree = True
-        if i >= 10000:
-            print("end of loop!")
-            found_christmas_tree = True
-        i += 1
 
-    return i - 1
+    return i
 
 
 test_input = False
