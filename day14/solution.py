@@ -15,14 +15,10 @@ def parse_input(file_path):
     return result
 
 
-def solution1(data, test_input=False):
-    if test_input:
-        size = (7, 11)  # might need to remove 1 here to start from 0
-    else:
-        size = (103, 101)
+def solution1(data):
+
     result = {}
     for robot in data:
-        # print(robot[0], robot[1])
         pos_y, pos_x = robot[0]
         vel_y, vel_x = robot[1]
         for _ in range(100):
@@ -52,12 +48,8 @@ def solution1(data, test_input=False):
     return quadrant_sum
 
 
-def solution2(data, test_input=False, print_tree=False):
+def solution2(data, print_tree=False):
 
-    if test_input:
-        size = (7, 11)
-    else:
-        size = (103, 101)
     found_christmas_tree = False
     i = 1
     while not found_christmas_tree:
@@ -95,13 +87,22 @@ def solution2(data, test_input=False, print_tree=False):
     return i - 1
 
 
-data = parse_input("input.txt")
+test_input = False
+
+if test_input:
+    size = (7, 11)
+    file_name = "testinput.txt"
+else:
+    size = (103, 101)
+    file_name = "input.txt"
+
+data = parse_input(file_name)
 
 start_time = time.time()
-sol1 = solution1(data, test_input=False)
+sol1 = solution1(data)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 
 
 start_time = time.time()
-sol2 = solution2(data, test_input=False, print_tree=False)
+sol2 = solution2(data, print_tree=False)
 print(f"solution 2: {sol2} (runtime: {(time.time() - start_time)} seconds)")
