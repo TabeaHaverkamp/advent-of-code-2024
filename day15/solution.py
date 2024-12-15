@@ -95,8 +95,7 @@ def solution1(warehouse, instructions, index):
 def solution2(warehouse, instructions, index):
 
     def move_up_down(warehouse, index, direction, moving={}):
-        if moving == -1:
-            return -1
+
         new_index = move(index, directions[direction])
 
         if new_index in moving.keys():
@@ -127,7 +126,7 @@ def solution2(warehouse, instructions, index):
             return moving
 
     # move according to instructions
-    for i, direction in enumerate(instructions):
+    for _, direction in enumerate(instructions):
         new_index = move(index, directions[direction])
 
         new_elem = warehouse[new_index[0]][new_index[1]]
@@ -138,16 +137,7 @@ def solution2(warehouse, instructions, index):
 
         elif new_elem in "[]":  # moooove
             moving = move_up_down(warehouse, index, direction, {})
-            replace = False
             if moving != -1:  # when not reached border during move
-
-                replace = True
-                for k, v in moving.items():
-                    moved_index = move(k, directions[direction])
-                    if warehouse[moved_index[0]][moved_index[1]] == "#":
-                        replace = False
-
-            if replace:
                 # clean slate for moving: remove all old brackets
                 for k, v in moving.items():
                     warehouse[k[0]][k[1]] = "."
@@ -156,6 +146,7 @@ def solution2(warehouse, instructions, index):
                     moved_index = move(k, directions[direction])
                     warehouse[moved_index[0]][moved_index[1]] = v
 
+                # take care of the robo
                 warehouse[new_index[0]][new_index[1]] = "@"
                 warehouse[index[0]][index[1]] = "."
 
