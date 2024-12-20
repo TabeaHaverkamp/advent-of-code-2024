@@ -94,7 +94,13 @@ def dijkstra(current_index, current_direction, border=None):
     return visit_dict
 
 
-def solution1(data, start, end):
+def in_bounds(index, data_len):
+    return not (
+        any(map(lambda x: x < 0, index)) or any(map(lambda x: x >= data_len, index))
+    )
+
+
+def solution1(data, start):
 
     border_set = {
         (i, j)
@@ -103,40 +109,40 @@ def solution1(data, start, end):
         if elem == "#"
     }
 
-    def get_single_borders(border_set):
+    def get_single_borders(border_set, bounds, distance_map):
         borders = set()
         for r, c in border_set:
             # Check neighbors
-            if all(neighbor not in border_set for neighbor in [(r - 1, c), (r + 1, c)]):
-                borders.add((r, c))
-            elif all(
-                neighbor not in border_set for neighbor in [(r, c - 1), (r, c + 1)]
-            ):
-                borders.add((r, c))
+            updown = [(r - 1, c), (r + 1, c)]
+            leftright = [(r, c - 1), (r, c + 1)]
+            if all(neighbor not in border_set for neighbor in updown):
+                if all(in_bounds(n, bounds) for n in updown):
+
+                    dist_u = distance_map[move((r, c), directions["U"])]
+                    dist_d = distance_map[move((r, c), directions["D"])]
+                    if abs(dist_d - dist_u) > 100:
+                        borders.add((r, c))
+
+            elif all(neighbor not in border_set for neighbor in leftright):
+                if all(in_bounds(n, bounds) for n in leftright):
+
+                    dist_l = distance_map[move((r, c), directions["L"])]
+                    dist_r = distance_map[move((r, c), directions["R"])]
+                    if abs(dist_l - dist_r) > 100:
+                        borders.add((r, c))
 
         return borders
 
     print(len(border_set))
-    border_set = get_single_borders(border_set)
     print(len(border_set))
     distance_map = dijkstra(start, "R")
-    original_time = distance_map[end]
+    border_set = get_single_borders(border_set, len(data), distance_map)
 
-    print("\n \n TESTING STARTS \n\n")
-    count_cheats = 0
-    for idx, border in enumerate(border_set):
-        if idx % 100 == 0:
-            print("---", idx, count_cheats)
-        cheat_distance_map = dijkstra(start, "R", border)
-        cheat_time = cheat_distance_map[end]
-        if original_time - cheat_time >= 100:
-            count_cheats += 1
-
-    return count_cheats
+    return len(border_set)
 
 
 data, start_index, end_index = parse_input(filename)
 
 start_time = time.time()
-sol1 = solution1(data, start_index, end_index)
+sol1 = solution1(data, start_index)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
