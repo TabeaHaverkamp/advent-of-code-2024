@@ -6,8 +6,12 @@ import heapq
 TEST_INPUT = False
 if TEST_INPUT:
     filename = "testinput.txt"
+    cheat_len = 20
+    saved_time = 76
 else:
     filename = "input.txt"
+    cheat_len = 20
+    saved_time = 100
 
 directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
 turns = "UDRL"
@@ -53,7 +57,7 @@ def print_debug(data):
         print(str(idx) + " ".join(f"{cell:<{max_length}}" for cell in l))
 
 
-def dijkstra(current_index, current_direction, border=None):
+def dijkstra(data, current_index, current_direction, border=None):
 
     visit_dict = {
         (i, j): float("inf")
@@ -133,16 +137,50 @@ def solution1(data, start):
 
         return borders
 
-    print(len(border_set))
-    print(len(border_set))
-    distance_map = dijkstra(start, "R")
+    distance_map = dijkstra(data, start, "R")
     border_set = get_single_borders(border_set, len(data), distance_map)
 
     return len(border_set)
 
 
+def solution2(data, start):
+    def get_teleports(index, distance_map):
+        costs = 0
+        for i in range(-cheat_len, cheat_len + 1):
+            for j in range(-cheat_len, cheat_len + 1):
+                if abs(i) + abs(j) <= cheat_len:
+                    new_index = move(index, (i, j))
+                    if new_index in distance_map:
+
+                        if (
+                            distance_map[index]
+                            + abs(i)
+                            + abs(j)  # new costs to get to new_index
+                            <= distance_map[new_index] - saved_time
+                        ):
+                            costs += 1
+
+        return costs
+
+    distance_map = dijkstra(data, start, "R")
+
+    found_cheats = 0
+    for index in distance_map:
+        found_cheats += get_teleports(index, distance_map)
+
+    return found_cheats
+
+
 data, start_index, end_index = parse_input(filename)
+
 
 start_time = time.time()
 sol1 = solution1(data, start_index)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
+
+
+start_time = time.time()
+sol2 = solution2(data, start_index)
+print(
+    f"solution 2: {sol2} with min saved time {saved_time}, cheats: {cheat_len} (runtime: {(time.time() - start_time)} seconds)"
+)
