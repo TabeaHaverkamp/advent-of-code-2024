@@ -6,11 +6,14 @@ import heapq
 TEST_INPUT = False
 if TEST_INPUT:
     filename = "testinput.txt"
-    cheat_len = 20
+    cheat_len_part2 = 20
+    cheat_len_part1 = 2
+
     saved_time = 76
 else:
     filename = "input.txt"
-    cheat_len = 20
+    cheat_len_part2 = 20
+    cheat_len_part1 = 2
     saved_time = 100
 
 directions = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
@@ -98,75 +101,43 @@ def dijkstra(data, current_index, current_direction, border=None):
     return visit_dict
 
 
-def in_bounds(index, data_len):
-    return not (
-        any(map(lambda x: x < 0, index)) or any(map(lambda x: x >= data_len, index))
-    )
+def get_teleports(index, distance_map, cheat_len, saved_time):
+    costs = 0
+    for i in range(-cheat_len, cheat_len + 1):
+        for j in range(-cheat_len, cheat_len + 1):
+            if abs(i) + abs(j) <= cheat_len:
+                new_index = move(index, (i, j))
+                if new_index in distance_map:
+
+                    if (
+                        distance_map[index]
+                        + abs(i)
+                        + abs(j)  # new costs to get to new_index
+                        <= distance_map[new_index] - saved_time
+                    ):
+                        costs += 1
+
+    return costs
 
 
 def solution1(data, start):
-
-    border_set = {
-        (i, j)
-        for i, row in enumerate(data)
-        for j, elem in enumerate(row)
-        if elem == "#"
-    }
-
-    def get_single_borders(border_set, bounds, distance_map):
-        borders = set()
-        for r, c in border_set:
-            # Check neighbors
-            updown = [(r - 1, c), (r + 1, c)]
-            leftright = [(r, c - 1), (r, c + 1)]
-            if all(neighbor not in border_set for neighbor in updown):
-                if all(in_bounds(n, bounds) for n in updown):
-
-                    dist_u = distance_map[move((r, c), directions["U"])]
-                    dist_d = distance_map[move((r, c), directions["D"])]
-                    if abs(dist_d - dist_u) > 100:
-                        borders.add((r, c))
-
-            elif all(neighbor not in border_set for neighbor in leftright):
-                if all(in_bounds(n, bounds) for n in leftright):
-
-                    dist_l = distance_map[move((r, c), directions["L"])]
-                    dist_r = distance_map[move((r, c), directions["R"])]
-                    if abs(dist_l - dist_r) > 100:
-                        borders.add((r, c))
-
-        return borders
-
-    distance_map = dijkstra(data, start, "R")
-    border_set = get_single_borders(border_set, len(data), distance_map)
-
-    return len(border_set)
-
-
-def solution2(data, start):
-    def get_teleports(index, distance_map):
-        costs = 0
-        for i in range(-cheat_len, cheat_len + 1):
-            for j in range(-cheat_len, cheat_len + 1):
-                if abs(i) + abs(j) <= cheat_len:
-                    new_index = move(index, (i, j))
-                    if new_index in distance_map:
-
-                        if (
-                            distance_map[index]
-                            + abs(i)
-                            + abs(j)  # new costs to get to new_index
-                            <= distance_map[new_index] - saved_time
-                        ):
-                            costs += 1
-
-        return costs
 
     distance_map = dijkstra(data, start, "R")
 
     found_cheats = 0
     for index in distance_map:
-        found_cheats += get_teleports(index, distance_map)
+        found_cheats += get_teleports(index, distance_map, cheat_len_part1, saved_time)
+
+    return found_cheats
+
+
+def solution2(data, start):
+
+    distance_map = dijkstra(data, start, "R")
+
+    found_cheats = 0
+    for index in distance_map:
+        found_cheats += get_teleports(index, distance_map, cheat_len_part2, saved_time)
 
     return found_cheats
 
@@ -182,5 +153,5 @@ print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 start_time = time.time()
 sol2 = solution2(data, start_index)
 print(
-    f"solution 2: {sol2} with min saved time {saved_time}, cheats: {cheat_len} (runtime: {(time.time() - start_time)} seconds)"
+    f"solution 2: {sol2} with min saved time {saved_time}, cheats: {cheat_len_part2} (runtime: {(time.time() - start_time)} seconds)"
 )
