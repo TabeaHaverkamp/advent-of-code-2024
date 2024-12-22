@@ -52,44 +52,39 @@ def find_repeating_patterns_optimized(pattern_lists, cost_lists, pattern_length=
     all_seen_patterns = set()
 
     # Process each list
-    for idx, (cost_lsts, pattern_lst) in enumerate(zip(cost_lists, pattern_lists)):
+    for cost_lst, pattern_lst in zip(cost_lists, pattern_lists):
+        seen_patterns = {}
+        pattern_cst = defaultdict(int)
         # Use a sliding window to extract patterns
-        seen_patterns = set()
         for i in range(len(pattern_lst) - pattern_length + 1):
             pattern = tuple(pattern_lst[i : i + pattern_length])
-            if pattern not in seen_patterns:  # Avoid recounting in the same list
-                seen_patterns.add(pattern)
+            if pattern not in seen_patterns:
+                # First occurrence of this pattern in the current list
+                seen_patterns[pattern] = i
                 pattern_counts[pattern] += 1
-        all_seen_patterns.update(seen_patterns)
 
-        pattern_cst = defaultdict(int)
-        # find the first occurence of every pattern, save the cost.
-        for pattern in seen_patterns:
-            first_cost = find_first_occurrence(
-                pattern_lst, cost_list=cost_lsts, pattern=pattern
-            )
-            pattern_cst[pattern] = first_cost
-            # if pattern == my_pattern:
-            #     print(
-            #         "occurence: ",
-            #         pattern,
-            #         first_cost,
-            #     )
+        # Add the seen patterns for this list to the global set
+        all_seen_patterns.update(seen_patterns.keys())
+
+        # Map patterns to their first costs directly
+        for pattern, first_index in seen_patterns.items():
+            pattern_cst[pattern] = cost_lst[first_index]
+
+        # Append costs for this list
         pattern_costs.append(pattern_cst)
 
-    print("all patterns: ", len(all_seen_patterns))
-    return all_seen_patterns, pattern_costs
+    return pattern_costs
 
 
 def solution2(data):
     # get the costs and patterns through all the instructions
     costs = []
     patterns = []
-    for idx, s in enumerate(data):
+    for s in data:
         price = s % 10
         c = []
         p = []
-        for i in range(generate_numbers):
+        for _ in range(generate_numbers):
             s = secret_number(s)
             new_price = s % 10
 
@@ -99,22 +94,16 @@ def solution2(data):
         costs.append(c)
         patterns.append(p)
     # get all patterns that exist
-    seen_patterns, pattern_cost = find_repeating_patterns_optimized(
+    pattern_cost = find_repeating_patterns_optimized(
         cost_lists=costs, pattern_lists=patterns
     )
 
-    max_bananas = 0
-    # go through all patterns and get the cost
-    for s in seen_patterns:
-        this_sum = 0
-        for p in pattern_cost:
-            this_sum += p[s]
-        # if s == my_pattern:
-        #     print("total bananas for pattern", my_pattern, ":", this_sum)
-        if this_sum > max_bananas:
-            max_bananas = this_sum
-        # print("---", s, this_sum)
-    return max_bananas
+    result = defaultdict(int)
+    for lst in pattern_cost:
+        for key, value in lst.items():
+            result[key] = result[key] + value
+
+    return max(result.values())
 
 
 data = parse_input(filename)
