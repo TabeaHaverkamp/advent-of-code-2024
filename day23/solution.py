@@ -12,39 +12,38 @@ else:
 def parse_input(file_path):
     with open(file_path, "r") as file:
         paths = [tuple(line.strip().split("-")) for line in file]
-    return paths
+        G = nx.DiGraph(paths).to_undirected()
+
+    return G
 
 
-def solution1(edges):
-
-    G = nx.DiGraph(edges).to_undirected()
+def solution1(graph):
 
     cycles = [
         cycle
-        for cycle in nx.simple_cycles(G, length_bound=3)
-        if any("t" == node[0] for node in cycle)
+        for cycle in nx.simple_cycles(graph, length_bound=3)
+        if len(cycle) <= 3 and any(node.startswith("t") for node in cycle)
     ]
 
     return len(cycles)
 
 
-def solution2(edges):
+def solution2(graph):
 
-    G = nx.DiGraph(edges).to_undirected()
-    cliques = list(nx.find_cliques(G))
+    cliques = list(nx.find_cliques(graph))
     biggest_clique = max(cliques, key=len)
     password = ",".join(sorted(biggest_clique))
     return password
 
 
-paths = parse_input(filename)
+graph = parse_input(filename)
 
 
 start_time = time.time()
-sol1 = solution1(paths)
+sol1 = solution1(graph)
 print(f"solution 1: {sol1} (runtime: {(time.time() - start_time)} seconds)")
 
 
 start_time = time.time()
-sol2 = solution2(paths)
+sol2 = solution2(graph)
 print(f"solution 2: {sol2} (runtime: {(time.time() - start_time)} seconds)")
